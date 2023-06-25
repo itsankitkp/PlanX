@@ -6,8 +6,12 @@
 #define FB_HIGH_BYTE_COMMAND 14
 #define FB_LOW_BYTE_COMMAND 15
 
-
-
+/* VGA provides support for 16 colors */
+#define BLACK 0
+#define GREEN 2
+#define RED 4
+#define YELLOW 14
+#define WHITE 15
 /** fb_move_cursor:
  * Moves the cursor of the framebuffer to the given position
  *
@@ -29,12 +33,26 @@ void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg)
     fb[i + 1] = ((fg & 0x0F) << 4) | (bg & 0x0F);
 }
 
-void fb_write(char* text, int color)
+void fb_write(char *text, int color)
 {
-    int index=0;
-    while(*text!='\n'){
-    fb_write_cell(index, *text, 0, color);
-    text++;
-    index=index+2;
+    int index = 0;
+    while (*text != '\n')
+    {
+        fb_write_cell(index, *text, 0, color);
+        text++;
+        index = index + 2;
+    }
+    fb_move_cursor(index/2);
+}
+
+void fb_clear_screen()
+{
+    int index = 0;
+    /* there are 25 lines each of 80 columns;
+       each element takes 2 bytes */
+    while (index < 80 * 25 * 2)
+    {
+        fb_write_cell(index, ' ', BLACK, WHITE);
+        index += 2;
     }
 }

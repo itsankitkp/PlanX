@@ -38,9 +38,8 @@ void print_string(char *str, unsigned char color)
 
 int main()
 {
+fb_clear_screen();
 
-fb_write_cell(0, 'A', 0,5);
-fb_write_cell(2, 'B', 0,5);
-fb_write("this is test\n", 5);
+fb_write("this is test\n", WHITE);
     return 0;
 }

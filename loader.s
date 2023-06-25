@@ -1,24 +1,21 @@
-global loader
-MAGIC_NUMBER equ 0x1BADB002
-FLAGS equ 0x0
-CHECKSUM equ -MAGIC_NUMBER; define the magic number constant
+bits 32
 
-section .text:
-align 4
-    dd MAGIC_NUMBER
-    dd FLAGS; start of the text (code) section
-    dd CHECKSUM
+section .multiboot               ;according to multiboot spec
+        dd 0x1BADB002            ;set magic number for
+                                 ;bootloader
+        dd 0x0                   ;set flags
+        dd - (0x1BADB002 + 0x0)  ;set checksum
 
-loader:
-    mov eax, 0xCAFEBABE
+section .text
+global start
+extern main                      ;defined in the C file
 
-.loop:
-    jmp .loop
+start:
+        cli                      ;block interrupts
+        mov esp, stack_space     ;set stack pointer
+        call main
+        hlt                      ;halt the CPU
 
-KERNEL_STACK_SIZE equ 4096
 section .bss
-align 4
-kernel_stack:
-    resb KERNEL_STACK_SIZE
-
-mov esp, kernel_stack + KERNEL_STACK_SIZE
+resb 8192                        ;8KB for stack
+stack_space:

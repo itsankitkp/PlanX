@@ -1,4 +1,5 @@
 #include "io.h"
+#include "keyboard.h"
 #define FB_GREEN 2
 #define FB_DARK_GREY 8
 
@@ -41,5 +42,14 @@ int main()
 fb_clear_screen();
 
 fb_write("this is test\n", WHITE);
+char x = 'A';
+while (x!='W'){
+x = get_ascii();
+fb_write_cell(10, x, 15,0);
+if (x=='W')
+fb_write("Found W\n",WHITE);
+}
+
+fb_write_cell(10, x, 15,0);
     return 0;
 }

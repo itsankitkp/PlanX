@@ -16,6 +16,16 @@
 #define WHITE 15
 
 void outb(unsigned short port, unsigned char data);
+
+/** inb:
+* Read a byte from an I/O port.
+*
+* @param port The address of the I/O port
+* @return
+The read byte
+*/
+unsigned char inb(unsigned short port);
+
 void fb_move_cursor(unsigned short pos);
 void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg);
 void fb_write(char* text, int color);

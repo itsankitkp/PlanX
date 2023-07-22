@@ -45,33 +45,33 @@ void fb_clear_screen()
     }
 }
 
-void fb_print_address(char* some)
-{
-    char address[20];  // Assuming a fixed size for the character array to store the address
+// void fb_print_address(char* some)
+// {
+//     char address[20];  // Assuming a fixed size for the character array to store the address
 
-    unsigned long long int addressValue = (unsigned long long int)some;
+//     unsigned long long int addressValue = (unsigned long long int)some;
 
-    char hexDigits[] = "0123456789ABCDEF";
-    int i = 0;
+//     char hexDigits[] = "0123456789ABCDEF";
+//     int i = 0;
 
-    while (addressValue > 0) {
-        address[i++] = hexDigits[addressValue % 16];
-        addressValue /= 16;
-    }
+//     while (addressValue > 0) {
+//         address[i++] = hexDigits[addressValue % 16];
+//         addressValue /= 16;
+//     }
 
-    // Reverse the string
-    int start = 0;
-    int end = i - 1;
-    while (start < end) {
-        char temp = address[start];
-        address[start] = address[end];
-        address[end] = temp;
-        start++;
-        end--;
-    }
+//     // Reverse the string
+//     int start = 0;
+//     int end = i - 1;
+//     while (start < end) {
+//         char temp = address[start];
+//         address[start] = address[end];
+//         address[end] = temp;
+//         start++;
+//         end--;
+//     }
 
-    // Null-terminate the string
-    address[i] = '\n';
+//     // Null-terminate the string
+//     address[i] = '\n';
 
-    fb_write(address, WHITE);
-}
+//     fb_write(address, WHITE);
+// }

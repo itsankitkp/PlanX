@@ -24,7 +24,7 @@ void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg)
 void fb_write(char *text, int color)
 {
     int index = 0;
-    while (*text != '\n')
+    while (*text != '\0')
     {
         fb_write_cell(index, *text, 0, color);
         text++;
@@ -44,3 +44,34 @@ void fb_clear_screen()
         index += 2;
     }
 }
+
+// void fb_print_address(char* some)
+// {
+//     char address[20];  // Assuming a fixed size for the character array to store the address
+
+//     unsigned long long int addressValue = (unsigned long long int)some;
+
+//     char hexDigits[] = "0123456789ABCDEF";
+//     int i = 0;
+
+//     while (addressValue > 0) {
+//         address[i++] = hexDigits[addressValue % 16];
+//         addressValue /= 16;
+//     }
+
+//     // Reverse the string
+//     int start = 0;
+//     int end = i - 1;
+//     while (start < end) {
+//         char temp = address[start];
+//         address[start] = address[end];
+//         address[end] = temp;
+//         start++;
+//         end--;
+//     }
+
+//     // Null-terminate the string
+//     address[i] = '\n';
+
+//     fb_write(address, WHITE);
+// }

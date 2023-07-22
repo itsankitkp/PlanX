@@ -1,4 +1,4 @@
-OBJECTS = loader.o kmain.o io.o inb.o outb.o keyboard.o
+OBJECTS = loader.o kmain.o io.o inb.o outb.o keyboard.o interrupts.o interrupts.0 descriptor_tables.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
@@ -11,16 +11,17 @@ DRIVERS_DIR := drivers
 INTERRUPTS_DIR := interrupts
 KERNEL_DIR := kernel
 ARCH_DIR := arch
+LIB_DIR := lib
 
 # Source files
-C_SRCS := $(shell find $(DRIVERS_DIR) -name "*.c") $(shell find $(INTERRUPTS_DIR) -name "*.c") $(shell find $(KERNEL_DIR) -name "*.c")
-ASM_SRCS := $(shell find $(DRIVERS_DIR) -name "*.s") $(shell find $(ARCH_DIR) -name "*.s")
+C_SRCS := $(shell find $(DRIVERS_DIR) -name "*.c") $(shell find $(INTERRUPTS_DIR) -name "*.c") $(shell find $(KERNEL_DIR) -name "*.c") $(shell find $(LIB_DIR) -name "*.c")
+ASM_SRCS := $(shell find $(DRIVERS_DIR) -name "*.s") $(shell find $(ARCH_DIR) -name "*.s") $(shell find $(INTERRUPTS_DIR) -name "*.s")
 
 # Object files
 OBJS := $(C_SRCS:%.c=%.o) $(ASM_SRCS:%.s=%.o)
 
 # Include directories
-INCLUDE_DIRS := $(shell find $(DRIVERS_DIR) -type d) $(shell find $(INTERRUPTS_DIR) -type d) $(shell find $(ARCH_DIR) -type d)
+INCLUDE_DIRS := $(shell find $(DRIVERS_DIR) -type d) $(shell find $(INTERRUPTS_DIR) -type d) $(shell find $(ARCH_DIR) -type d) $(shell find $(KERNEL_DIR) -type d) $(shell find $(LIB_DIR) -type d)
 
 # Include flags
 INCLUDE_FLAGS := $(addprefix -I, $(INCLUDE_DIRS))

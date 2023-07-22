@@ -28,3 +28,8 @@ void pic_acknowledge(unsigned int interrupt)
         outb(PIC2_PORT_A, PIC_ACK);
     }
 }
+
+// void interrupt_handler( unsigned int interrupt)
+// {
+//     fb_write("Got interuppted by"+(char) interrupt+'\n', WHITE);
+// }

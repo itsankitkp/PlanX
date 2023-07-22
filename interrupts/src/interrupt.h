@@ -16,4 +16,4 @@ unsigned int cs;
 unsigned int eflags;
 } __attribute__((packed));
 
-void interrupt_handler(unsigned int interrupt);
+//void interrupt_handler(unsigned int interrupt);

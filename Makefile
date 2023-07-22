@@ -11,16 +11,17 @@ DRIVERS_DIR := drivers
 INTERRUPTS_DIR := interrupts
 KERNEL_DIR := kernel
 ARCH_DIR := arch
+LIB_DIR := lib
 
 # Source files
-C_SRCS := $(shell find $(DRIVERS_DIR) -name "*.c") $(shell find $(INTERRUPTS_DIR) -name "*.c") $(shell find $(KERNEL_DIR) -name "*.c")
+C_SRCS := $(shell find $(DRIVERS_DIR) -name "*.c") $(shell find $(INTERRUPTS_DIR) -name "*.c") $(shell find $(KERNEL_DIR) -name "*.c") $(shell find $(LIB_DIR) -name "*.c")
 ASM_SRCS := $(shell find $(DRIVERS_DIR) -name "*.s") $(shell find $(ARCH_DIR) -name "*.s") $(shell find $(INTERRUPTS_DIR) -name "*.s")
 
 # Object files
 OBJS := $(C_SRCS:%.c=%.o) $(ASM_SRCS:%.s=%.o)
 
 # Include directories
-INCLUDE_DIRS := $(shell find $(DRIVERS_DIR) -type d) $(shell find $(INTERRUPTS_DIR) -type d) $(shell find $(ARCH_DIR) -type d) $(shell find $(KERNEL_DIR) -type d)
+INCLUDE_DIRS := $(shell find $(DRIVERS_DIR) -type d) $(shell find $(INTERRUPTS_DIR) -type d) $(shell find $(ARCH_DIR) -type d) $(shell find $(KERNEL_DIR) -type d) $(shell find $(LIB_DIR) -type d)
 
 # Include flags
 INCLUDE_FLAGS := $(addprefix -I, $(INCLUDE_DIRS))

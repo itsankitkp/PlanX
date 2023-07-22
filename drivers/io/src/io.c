@@ -24,7 +24,7 @@ void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg)
 void fb_write(char *text, int color)
 {
     int index = 0;
-    while (*text != '\n')
+    while (*text != '\0')
     {
         fb_write_cell(index, *text, 0, color);
         text++;

@@ -29,7 +29,7 @@ void pic_acknowledge(unsigned int interrupt)
     }
 }
 
-void interrupt_handler( unsigned int interrupt)
-{
-    fb_write("Got interuppted by"+(char) interrupt+'\n', WHITE);
-}
+// void interrupt_handler( unsigned int interrupt)
+// {
+//     fb_write("Got interuppted by"+(char) interrupt+'\n', WHITE);
+// }

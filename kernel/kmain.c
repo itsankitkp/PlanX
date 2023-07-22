@@ -42,7 +42,7 @@ int main()
 {
 fb_clear_screen();
 
-fb_write("System is up\n", WHITE);
+// fb_write("System is up\n", WHITE);
 init_descriptor_tables();
-//asm volatile ("int $0x1");
+asm volatile ("int $0x8");
 }

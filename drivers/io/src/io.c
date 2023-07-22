@@ -20,17 +20,27 @@ void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg)
     fb[i] = c;
     fb[i + 1] = ((fg & 0x0F) << 4) | (bg & 0x0F);
 }
-
+int write_index = 0;
 void fb_write(char *text, int color)
 {
-    int index = 0;
+
     while (*text != '\0')
     {
-        fb_write_cell(index, *text, 0, color);
+        if (*text == '\n')
+        {
+            int new_index = (write_index + 55) * 2;
+            while (write_index < new_index)
+            {
+                fb_write_cell(write_index, ' ', BLACK, WHITE);
+                write_index += 2;
+                continue;
+            }
+        }
+        fb_write_cell(write_index, *text, 0, color);
         text++;
-        index = index + 2;
+        write_index = write_index + 2;
     }
-    fb_move_cursor(index/2);
+    fb_move_cursor(write_index / 2);
 }
 
 void fb_clear_screen()

@@ -16,7 +16,9 @@ void run_modules(multiboot_info_t *mb_info)
     {
         multiboot_module_t *module = (multiboot_module_t *)(mods_addr + (mod * sizeof(multiboot_module_t))); /* Loop through all modules */
         call_module_t start_program = (call_module_t)module->mod_start;
-        start_program();
+        if (start_program)
+        {
+        }
     }
 }
 
@@ -24,8 +26,10 @@ int main(const void *multiboot_struct)
 {
     fb_clear_screen();
 
-    fb_write("System is up\n", WHITE);
+    fb_write("System is up\0", WHITE);
+
     init_descriptor_tables();
-    //run_modules((multiboot_info_t *)multiboot_struct);
-   // asm volatile ("int $0x8");
+    run_modules((multiboot_info_t *)multiboot_struct);
+    fb_write("\nDone all init\0", WHITE);
+    // asm volatile ("int $0x8");
 }

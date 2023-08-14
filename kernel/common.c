@@ -8,3 +8,11 @@ void *memcpy(char *dst, char *src, int len)
 
     return p;
 }
+
+void *memset(char *dst,char src, int n)
+{
+	char *p = dst;
+	while (n--)
+		*dst++ = src;
+	return p;
+}

@@ -11,7 +11,8 @@ typedef unsigned char  u8int;
 typedef          char  s8int;
 #define NULL ((void*)0)
 
-
+typedef void (*call_module_t)(void);
 void* memcpy(char* dst, char* src, int len);
+void *memset(char *dst,char src, int n);
 
 #endif

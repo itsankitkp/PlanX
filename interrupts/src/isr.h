@@ -1,6 +1,8 @@
 
-#include "common.h"
 
+#ifndef ISR_H
+#define ISR_H
+#include "common.h"
 typedef struct registers
 {
    u32int ds;                  // Data segment selector
@@ -8,3 +10,5 @@ typedef struct registers
    u32int int_no, err_code;    // Interrupt number and error code (if applicable)
    u32int eip, cs, eflags, useresp, ss; // Pushed by the processor automatically.
 } registers_t;
+void page_fault(registers_t regs);
+#endif

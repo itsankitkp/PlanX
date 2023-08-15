@@ -1,7 +1,7 @@
 OBJECTS = loader.o kmain.o io.o inb.o outb.o keyboard.o interrupts.o interrupts.0 descriptor_tables.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
--nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
+-nostartfiles -nodefaultlibs -Wall -Wextra -Werror -Wno-error=main -ggdb -c
 LDFLAGS = -T link.ld -melf_i386
 AS = nasm
 ASFLAGS = -f elf
@@ -36,6 +36,7 @@ os.iso: kernel.elf
 	mkdir -p iso
 	mkdir -p iso/boot
 	mkdir -p iso/boot/grub
+	mkdir -p iso/boot/modules
 	cp kernel.elf iso/boot/kernel.elf
 	cp grub.cfg iso/boot/grub/grub.cfg
 	grub-mkrescue -o os.iso iso/
@@ -49,4 +50,4 @@ run: os.iso
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(OBJS) $(TARGET) &&  rm kernel.elf

@@ -30,9 +30,11 @@ int main()
 
     init_descriptor_tables();
     fb_write("\nDone all init\0", WHITE);
-    initialise_paging();
+    init_paging();
     fb_write("Paging init\0", WHITE);
-    asm volatile ("int $0x8");
+    //asm volatile ("int $0x8");
+     u32int ptr = *(u32int*)0xA0000000;
+ptr++;
     return 0;
 
     // asm volatile ("int $0x8");

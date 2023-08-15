@@ -32,6 +32,7 @@ int main()
     fb_write("\nDone all init\0", WHITE);
     initialise_paging();
     fb_write("Paging init\0", WHITE);
+    asm volatile ("int $0x8");
     return 0;
 
     // asm volatile ("int $0x8");

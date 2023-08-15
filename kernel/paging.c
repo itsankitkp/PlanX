@@ -10,6 +10,7 @@ u32int nframes;
 // Defined in kheap.c
 
  page_directory_t* kernel_directory;
+  page_directory_t* current_directory;
 // Static function to set a bit in the frames bitset
 void set_frame(u32int frame_addr)
 {
@@ -74,7 +75,7 @@ void alloc_frame(page_t *page, int is_kernel, int is_writeable)
             // PANIC is just a macro that prints a message to the screen then hits an infinite loop.
             fb_write("No free frames!\n", WHITE);
         }
-        set_frame(idx * 0x1000);           // this frame is now ours!
+        set_frame(idx * 0x100000);           // this frame is now ours!
         page->present = 1;                 // Mark it as present.
         page->rw = (is_writeable) ? 1 : 0; // Should the page be writeable?
         page->user = (is_kernel) ? 0 : 1;  // Should the page be user-mode?
@@ -110,6 +111,8 @@ void initialise_paging()
     // Let's make a page directory.
     kernel_directory = (page_directory_t *)kmalloc_a(sizeof(page_directory_t), 1);
     memset((char *)kernel_directory, 0, sizeof(page_directory_t));
+    current_directory = kernel_directory;
+
 
     // We need to identity map (phys addr = virt addr) from
     // 0x0 to the end of used memory, so we can access this
@@ -134,7 +137,7 @@ void initialise_paging()
 
 void switch_page_directory(page_directory_t *dir)
 {
-    //current_directory = dir;
+    current_directory = dir;
     asm volatile("mov %0, %%cr3" ::"r"(&dir->tablesPhysical));
     u32int cr0;
     asm volatile("mov %%cr0, %0"

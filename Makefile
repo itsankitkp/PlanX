@@ -43,6 +43,10 @@ os.iso: kernel.elf
 
 run: os.iso
 	qemu-system-x86_64 -boot d -cdrom os.iso -m 512 -D ./log.txt -monitor stdio
+
+debug: os.iso
+	qemu-system-x86_64 -boot d -cdrom os.iso -m 512 -s -S
+
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDE_FLAGS)  $< -o $@
 

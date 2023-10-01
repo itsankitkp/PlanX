@@ -58,23 +58,17 @@ extern main                      ;defined in the C file
 
 section .multiboot.text
 start:
-
-        xor eax, eax
-        lgdt  [gdt_descriptor]
-        
-        mov eax, cr0 ; Enable paging
-        or eax, 0x80000001
-        mov cr0, eax
-
+        nop
+        nop
         mov ecx, page_directory
         mov cr3, ecx ;
         mov ebx, cr4 ; read current cr4
         or ebx, 0x00000010 ; set PSE
         mov cr4, ebx; update cr4
         mov ebx, cr0 ; read current cr0
-        or ebx, 0x80000000 ; set PG
+        or ebx, 0x80000001 ; set PG
         mov cr0, ebx; update cr0
-        cli                      ;block interrupts
+        nop         ;cli                      ;block interrupts
         lea ebx, [higher_half] ; load the address of the label in ebx
         jmp ebx ; jump to the label
 

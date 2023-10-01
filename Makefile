@@ -6,6 +6,8 @@ LDFLAGS = -T link.ld -melf_i386
 AS = nasm
 ASFLAGS = -f elf
 
+QEMU = qemu-system-i386
+
 # Directories
 DRIVERS_DIR := drivers
 INTERRUPTS_DIR := interrupts
@@ -42,10 +44,10 @@ os.iso: kernel.elf
 	grub-mkrescue -o os.iso iso/
 
 run: os.iso
-	qemu-system-x86_64 -boot d -cdrom os.iso -m 512 -D ./log.txt -monitor stdio
+	$(QEMU) -boot d -cdrom os.iso -m 512 -D ./log.txt -monitor stdio
 
 debug: os.iso
-	qemu-system-x86_64 -boot d -cdrom os.iso -m 512 -s -S
+	$(QEMU) -boot d -cdrom os.iso -m 512 -s -S
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDE_FLAGS)  $< -o $@

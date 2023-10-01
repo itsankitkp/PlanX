@@ -2,14 +2,14 @@ OUTPUT_FORMAT(elf32-i386)
 ENTRY(start)
 SECTIONS
 {
-  . = 1M;
+  . = 0x100000;
 	_kernel_start = .;
 
-  .multiboot.data : {
+  .multiboot.data  ALIGN (0x1000): {
     *(.multiboot.data)
   }
 
-  .multiboot.text : {
+  .multiboot.text ALIGN (0x1000) : {
     *(.multiboot.text)
   }
 

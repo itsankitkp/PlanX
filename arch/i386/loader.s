@@ -30,15 +30,37 @@ start:
 fill_page_table: 
         xor eax, eax
         mov eax, ecx ; i 
-        imul eax, 0x00001000
+        imul eax, 4096
         or eax, 3
         mov [edi+4*ecx], eax
         inc ecx
         cmp ecx, 1024
         jne fill_page_table
 
+        ; 0xC0000000 should map to  0x100000
+        mov edi, page_table;
+        mov eax, 767;
+        mov eax, 0x00101000
+        or eax, 3
+        mov [edi+4*767], eax
+
+        xor ecx, ecx ; ecx=0
+        mov ecx, 1024
+        mov edi, page_table; copy address of page table
+fill_page_table1: 
+        xor eax, eax
+        mov eax, ecx ; i 
+        imul eax, 4096
+        or eax, 3
+        mov [edi+4*ecx], eax
+        inc ecx
+        cmp ecx, 2096
+        jne fill_page_table1
+
         xor ecx, ecx ; ecx=0
         mov edi, page_directory
+
+
         
 fill_page_directory:
         mov eax, 0x00000002;
@@ -48,8 +70,12 @@ fill_page_directory:
         jne fill_page_directory
 
         mov eax, page_table
-        or eax, 3
+        or eax, 83
         mov [page_directory], eax
+
+        mov eax, page_table+4
+        or eax, 83
+        mov [page_directory+4], eax
 
         ; Load the page directory base address
         mov eax, page_directory

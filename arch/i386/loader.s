@@ -13,45 +13,10 @@ section .multiboot.data               ;according to multiboot spec
         dd ALIGN_MODULES         ;set flags
         dd CHECKSUM  ;set checksum
 
-page_table1:
-    dd 0x00000003  ; Identity mapping for the first 4 MB
-
-page_table768:
-    dd 0x00000003  ; Mapping 768th page table  0xC0000000 to first 4 MB    
-
-page_directory:
-    ; the first entry identity maps the first 4MB of memory
-    ; All bits are clear except the following:
-    ; bit 7: PS The kernel page is 4MB.
-    ; bit 1: RW The kernel page is read/write.
-    ; bit 0: P  The kernel page is present.
-    dd 0x00000083; first table
-    times (768-1) dd 0; rest of the tables are empty
-    dd 0x00000083 ; 768th table for 0xC0000000
-    times 1024 - 768 - 1 dd 0;  rest of entries unmapped again
-
-; GDT (Global Descriptor Table) Setup
-gdt_start:
-    dq 0x0  ; Null descriptor
-    dq 0x0000000000000000  ; First descriptor (null)
-    
-    ; Code segment descriptor for accessing the first 1 MB (Limit = 1 MB)
-    dq 0x00CF920000000000  ; Base = 0x0, Limit = 1 MB, Code segment
-    
-    ; Data segment descriptor for accessing the first 1 MB (Limit = 1 MB)
-    dq 0x00CF960000000000  ; Base = 0x0, Limit = 1 MB, Data segment
-
-    ; Code segment descriptor for the higher-half kernel (Base = 0xC0000000, Limit = 4 GB)
-    dq 0x0020980000000000  ; Code segment descriptor (Base = 0xC0000000, Limit = 4 GB)
-
-    ; Data segment descriptor for the higher-half kernel (Base = 0xC0000000, Limit = 4 GB)
-    dq 0x0000920000000000  ; Data segment descriptor (Base = 0xC0000000, Limit = 4 GB)
-
-gdt_end:
-gdt_descriptor:
-    dw gdt_end - gdt_start - 1
-    dd gdt_start
-
+align 4096
+page_directory: resb 1024
+align 4096
+page_table:  resb 4096
 
 global start
 extern main                      ;defined in the C file
@@ -60,13 +25,40 @@ section .multiboot.text
 start:
         nop
         nop
-        mov ecx, page_directory
-        mov cr3, ecx ;
+        xor ecx, ecx ; ecx=0
+        mov edi, page_table; copy address of page table
+fill_page_table: 
+        xor eax, eax
+        mov eax, ecx ; i 
+        imul eax, 0x00001000
+        or eax, 3
+        mov [edi+4*ecx], eax
+        inc ecx
+        cmp ecx, 1024
+        jne fill_page_table
+
+        xor ecx, ecx ; ecx=0
+        mov edi, page_directory
+        
+fill_page_directory:
+        mov eax, 0x00000002;
+        mov [edi+4*ecx], eax
+        inc ecx
+        cmp ecx, 1024
+        jne fill_page_directory
+
+        mov eax, page_table
+        or eax, 3
+        mov [page_directory], eax
+
+        ; Load the page directory base address
+        mov eax, page_directory
+        mov cr3, eax
         mov ebx, cr4 ; read current cr4
         or ebx, 0x00000010 ; set PSE
-        mov cr4, ebx; update cr4
+        mov cr4, ebx ; update cr4
         mov ebx, cr0 ; read current cr0
-        or ebx, 0x80000001 ; set PG
+        or ebx, 0x80000000 ; set PG
         mov cr0, ebx; update cr0
         nop         ;cli                      ;block interrupts
         lea ebx, [higher_half] ; load the address of the label in ebx
@@ -82,7 +74,11 @@ higher_half:
         call main
         hlt                      ;halt the CPU
 
+
+
 section .bss
+
+
 resb 8192                        ;8KB for stack
 stack_space:
 

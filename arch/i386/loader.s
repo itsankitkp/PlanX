@@ -37,13 +37,6 @@ fill_page_table:
         cmp ecx, 1024
         jne fill_page_table
 
-        ; 0xC0000000 should map to  0x100000
-        mov edi, page_table;
-        mov eax, 767;
-        mov eax, 0x00101000
-        or eax, 3
-        mov [edi+4*767], eax
-
         xor ecx, ecx ; ecx=0
         mov ecx, 1024*768
         mov edi, 0x1000000;

@@ -27,15 +27,7 @@ int main()
     fb_clear_screen();
 
     fb_write("System is up\0", WHITE);
-
-    init_descriptor_tables();
-    fb_write("\nDone all init\0", WHITE);
-    init_paging();
-    fb_write("Paging init\0", WHITE);
-    //asm volatile ("int $0x8");
-     u32int ptr = *(u32int*)0xA0000000;
+     u32int ptr = *(u32int*)0xC0000000;
 ptr++;
     return 0;
-
-    // asm volatile ("int $0x8");
 }

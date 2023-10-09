@@ -25,6 +25,7 @@
 int main()
 {
     fb_clear_screen();
+    init_descriptor_tables();
 
     fb_write("System is up\0", WHITE);
      u32int ptr = *(u32int*)0xC0000000;

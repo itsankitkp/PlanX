@@ -44,10 +44,10 @@ struct idt_ptr_struct
 } __attribute__((packed));
 typedef struct idt_ptr_struct idt_ptr_t;
 
-#define GDTBASE 0x00000800
+#define GDTBASE 0xC0000800
 #define GDTSIZE 5 // number of gdt entries
 
-#define IDTBASE 0x00000A00
+#define IDTBASE 0xC0000A00
 #define IDTSIZE 32
 // These extern directives let us access the addresses of our ASM ISR handlers.
 

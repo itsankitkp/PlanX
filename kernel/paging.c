@@ -27,9 +27,10 @@ for(i = 0; i < 1024; i++)
 {
     // As the address is page aligned, it will always leave 12 bits zeroed.
     // Those bits are used by the attributes ;)
-   // first_page_table[i] = (i * 0x1000) | 3; // attributes: supervisor level, read/write, present.
+   first_page_table[i] = (i * 0x1000) | 3; // attributes: supervisor level, read/write, present.
     high_page_table[i] = (i * 0x1000) | 3;
 }
+//page_directory[0] = (((unsigned int)first_page_table)-KERNEL_HIGH_MEM) | 3;
 page_directory[768] = (((unsigned int)high_page_table)-KERNEL_HIGH_MEM) | 3;
 u32int page_directory_phy_addr = (unsigned int)page_directory-KERNEL_HIGH_MEM;
 loadPageDirectory(page_directory_phy_addr);

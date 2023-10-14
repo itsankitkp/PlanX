@@ -37,3 +37,12 @@ u32int kmalloc_ap(u32int sz, int align, u32int *phys)
     placement_address += sz;
     return tmp;
 }
+
+u32int allocate_page_frame(u32int addr, u32int size)
+{
+    u32int no_of_page_frames = (size/4096) + 1;
+    no_of_page_frames += 1;
+
+    return addr;
+
+}

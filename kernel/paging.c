@@ -6,6 +6,7 @@ u32int page_directory[1024] __attribute__((aligned(4096)));
 u32int first_page_table[1024] __attribute__((aligned(4096)));
 u32int high_page_table[1024] __attribute__((aligned(4096)));
 
+u32int allocated_phy_addr=0x0;
 u32int KERNEL_HIGH_MEM = 0xC0000000;
 
 void init_paging()
@@ -29,10 +30,30 @@ for(i = 0; i < 1024; i++)
     // Those bits are used by the attributes ;)
    first_page_table[i] = (i * 0x1000) | 3; // attributes: supervisor level, read/write, present.
     high_page_table[i] = (i * 0x1000) | 3;
+    allocated_phy_addr += (i * 0x1000);
 }
-//page_directory[0] = (((unsigned int)first_page_table)-KERNEL_HIGH_MEM) | 3;
+page_directory[0] = (((unsigned int)first_page_table)-KERNEL_HIGH_MEM) | 3;
 page_directory[768] = (((unsigned int)high_page_table)-KERNEL_HIGH_MEM) | 3;
 u32int page_directory_phy_addr = (unsigned int)page_directory-KERNEL_HIGH_MEM;
 loadPageDirectory(page_directory_phy_addr);
 enablePaging();
+}
+
+void enable_page(u32int addr, u32int count)
+{
+    static u32int page[1024] __attribute__((aligned(4096)));
+
+    u32int pde = addr >> 22;
+    u32int i;
+    u32int offset =allocated_phy_addr;
+    for (i=0; i<count; i++)
+    {
+        page[i] = (i*1000 + offset) |3;
+        allocated_phy_addr+=1000;
+    }
+    page_directory[pde] =(((unsigned int)page)-KERNEL_HIGH_MEM) | 3;
+
+   invlpg(addr);
+
+
 }

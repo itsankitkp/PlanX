@@ -24,7 +24,7 @@ extern main                      ;defined in the C file
 section .multiboot.text
 start:
         nop
-        nop
+        push ebx                ; save multiboot struct
         xor ecx, ecx            ; ecx=0
         mov edi, page_table     ; copy address of page table
 fill_page_table:
@@ -86,8 +86,10 @@ section .text
 higher_half:
         ;mov dword [page_directory], 0
         ;invlpg [0]
+        pop ebx                  ; multiboot struct
         mov esp, stack_space     ;set stack pointer
         mov ebp, stack_space     ;set stack pointer
+
         push ebx
         call main
         hlt                      ;halt the CPU

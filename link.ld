@@ -26,7 +26,7 @@ SECTIONS
 	}
 
   /* align at 4 KB and load at 1 MB + . */
-  .data ALIGN (0x1000) : AT(ADDR(.text)-0xC0000000)
+  .data ALIGN (0x1000) : AT(ADDR(.data)-0xC0000000)
   {
     *(.data) /* all data sections from all files */
   }

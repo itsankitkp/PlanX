@@ -28,7 +28,8 @@ int main()
     init_descriptor_tables();
 
     fb_write("System is up\0", WHITE);
-     u32int ptr = *(u32int*)0xC0000000;
+    init_paging();
+     u32int ptr = *(u32int*)0xA0000000;
 ptr++;
     return 0;
 }

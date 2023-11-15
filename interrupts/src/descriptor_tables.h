@@ -1,19 +1,56 @@
 #include "common.h"
 
-// This structure contains the value of one GDT entry.
-// We use the attribute 'packed' to tell GCC not to change
-// any of the alignment in the structure.
-struct gdt_entry_struct
-{
-   u16int limit_low;  // The lower 16 bits of the limit.
-   u16int base_low;   // The lower 16 bits of the base.
-   u8int base_middle; // The next 8 bits of the base.
-   u8int access;      // Access flags, determine what ring this segment can be used in.
-   u8int granularity;
-   u8int base_high; // The last 8 bits of the base.
+struct gdt_entry_bits {
+	u32int limit_low              : 16;
+	u32int base_low               : 24;
+	u32int accessed               :  1;
+	u32int read_write             :  1; // readable for code, writable for data
+	u32int conforming_expand_down :  1; // conforming for code, expand down for data
+	u32int code                   :  1; // 1 for code, 0 for data
+	u32int code_data_segment      :  1; // should be 1 for everything but TSS and LDT
+	u32int DPL                    :  2; // privilege level
+	u32int present                :  1;
+	u32int limit_high             :  4;
+	u32int available              :  1; // only used in software; has no effect on hardware
+	u32int long_mode              :  1;
+	u32int big                    :  1; // 32-bit opcodes for code, u32int stack for data
+	u32int gran                   :  1; // 1 to use 4k page addressing, 0 for byte addressing
+	u32int base_high              :  8;
 } __attribute__((packed));
-typedef struct gdt_entry_struct gdt_entry_t;
+typedef struct gdt_entry_bits gdt_entry_t;
 
+struct tss_entry_struct {
+	u32int prev_tss; // The previous TSS - with hardware task switching these form a kind of backward linked list.
+	u32int esp0;     // The stack pointer to load when changing to kernel mode.
+	u32int ss0;      // The stack segment to load when changing to kernel mode.
+	// Everything below here is unused.
+	u32int esp1; // esp and ss 1 and 2 would be used when switching to rings 1 or 2.
+	u32int ss1;
+	u32int esp2;
+	u32int ss2;
+	u32int cr3;
+	u32int eip;
+	u32int eflags;
+	u32int eax;
+	u32int ecx;
+	u32int edx;
+	u32int ebx;
+	u32int esp;
+	u32int ebp;
+	u32int esi;
+	u32int edi;
+	u32int es;
+	u32int cs;
+	u32int ss;
+	u32int ds;
+	u32int fs;
+	u32int gs;
+	u32int ldt;
+	u16int trap;
+	u16int iomap_base;
+} __attribute__((packed));;
+ 
+typedef struct tss_entry_struct tss_entry_t;
 struct gdt_ptr_struct
 {
    u16int limit; // The upper 16 bits of all selector limits.
@@ -45,7 +82,7 @@ struct idt_ptr_struct
 typedef struct idt_ptr_struct idt_ptr_t;
 
 #define GDTBASE 0xC0000800
-#define GDTSIZE 5 // number of gdt entries
+#define GDTSIZE 6 // number of gdt entries
 
 #define IDTBASE 0xC0000A00
 #define IDTSIZE 32
@@ -94,4 +131,5 @@ extern void idt_flush(u32int);
 
 // Internal function prototypes.
 void init_gdt();
-void gdt_set_gate(u32int, u32int, u8int, u8int, gdt_entry_t *);
+void install_tss(gdt_entry_t *g);
+extern void tss_flush();

@@ -6,7 +6,7 @@ gdt_entry_t gdt_entries[GDTSIZE];
 gdt_ptr_t gdt_ptr;
 idt_entry_t idt_entries[IDTSIZE];
 idt_ptr_t idt_ptr;
-
+tss_entry_t tss_entry;
 // Initialisation routine - zeroes all the interrupt service routines,
 // initialises the GDT and IDT.
 void init_descriptor_tables()
@@ -20,30 +20,106 @@ void init_gdt()
 {
    gdt_ptr.limit = GDTSIZE * 8;
    gdt_ptr.base = GDTBASE;
+   gdt_entry_t *null_segment = &gdt_entries[0];
+   // ring 0
+   gdt_entry_t *kernel_code_segment = &gdt_entries[1];
+   gdt_entry_t *kernel_data_segment = &gdt_entries[2];
 
-   gdt_set_gate(0, 0, 0, 0, &gdt_entries[0]);                // Null segment
-   gdt_set_gate(0, 0xFFFFFFFF, 0x9A, 0xCF, &gdt_entries[1]); // Code segment
-   gdt_set_gate(0, 0xFFFFFFFF, 0x92, 0xCF, &gdt_entries[2]); // Data segment
-   gdt_set_gate(0, 0xFFFFFFFF, 0xFA, 0xCF, &gdt_entries[3]); // User mode code segment
-   gdt_set_gate(0, 0xFFFFFFFF, 0xF2, 0xCF, &gdt_entries[4]); // User mode data segment
+   // ring 3
+   gdt_entry_t *user_code_segment = &gdt_entries[3];
+   gdt_entry_t *user_data_segment = &gdt_entries[4];
+
+   null_segment->limit_low = 0;
+   null_segment->base_low = 0;
+   null_segment->accessed = 0;
+   null_segment->read_write = 0;             // since this is a code segment, specifies that the segment is readable
+   null_segment->conforming_expand_down = 0; // does not matter for ring 3 as no lower privilege level exists
+   null_segment->code = 0;
+   null_segment->code_data_segment = 1;
+   null_segment->DPL = 0; // ring 3
+   null_segment->present = 0;
+   null_segment->limit_high = 0;
+   null_segment->available = 0;
+   null_segment->long_mode = 0;
+   null_segment->big = 0;  // it's 32 bits
+   null_segment->gran = 0; // 4KB page addressing
+   null_segment->base_high = 0;
+
+   kernel_code_segment->limit_low = 0xFFFF;
+   kernel_code_segment->base_low = 0;
+   kernel_code_segment->accessed = 0;
+   kernel_code_segment->read_write = 1;             // since this is a code segment, specifies that the segment is readable
+   kernel_code_segment->conforming_expand_down = 0; // does not matter for ring 3 as no lower privilege level exists
+   kernel_code_segment->code = 1;
+   kernel_code_segment->code_data_segment = 1;
+   kernel_code_segment->DPL = 0; // ring 0 [=]
+   kernel_code_segment->present = 1;
+   kernel_code_segment->limit_high = 0xF;
+   kernel_code_segment->available = 1;
+   kernel_code_segment->long_mode = 0;
+   kernel_code_segment->big = 1;  // it's 32 bits
+   kernel_code_segment->gran = 1; // 4KB page addressing
+   kernel_code_segment->base_high = 0;
+
+   *kernel_data_segment = *kernel_code_segment; // contents are similar so save time by copying
+   kernel_data_segment->code = 0;               // not code but data
+
+   user_code_segment->limit_low = 0xFFFF;
+   user_code_segment->base_low = 0;
+   user_code_segment->accessed = 0;
+   user_code_segment->read_write = 1;             // since this is a code segment, specifies that the segment is readable
+   user_code_segment->conforming_expand_down = 0; // does not matter for ring 3 as no lower privilege level exists
+   user_code_segment->code = 1;
+   user_code_segment->code_data_segment = 1;
+   user_code_segment->DPL = 3; // ring 3
+   user_code_segment->present = 1;
+   user_code_segment->limit_high = 0xF;
+   user_code_segment->available = 1;
+   user_code_segment->long_mode = 0;
+   user_code_segment->big = 1;  // it's 32 bits
+   user_code_segment->gran = 1; // 4KB page addressing
+   user_code_segment->base_high = 0;
+
+   *user_data_segment = *user_code_segment; // contents are similar so save time by copying
+   user_data_segment->code = 0;             // not code but data
 
    memcpy((char *)gdt_ptr.base, (char *)gdt_entries, gdt_ptr.limit);
 
    gdt_flush((u32int)&gdt_ptr);
+
+   install_tss(&gdt_entries[5]);
+   tss_flush();
 }
 
-// Set the value of one GDT entry.
-void gdt_set_gate(u32int base, u32int limit, u8int access, u8int gran, gdt_entry_t *gdt_entry)
+void install_tss(gdt_entry_t *g)
 {
-   gdt_entry->base_low = (base & 0xFFFF);
-   gdt_entry->base_middle = (base >> 16) & 0xFF;
-   gdt_entry->base_high = (base >> 24) & 0xFF;
+   // Compute the base and limit of the TSS for use in the GDT entry.
+   u32int base = (u32int)&tss_entry;
+   u32int limit = sizeof(tss_entry);
 
-   gdt_entry->limit_low = (limit & 0xFFFF);
-   gdt_entry->granularity = (limit >> 16) & 0x0F;
+   // Add a TSS descriptor to the GDT.
+   g->limit_low = limit;
+   g->base_low = base;
+   g->accessed = 1;               // With a system entry (`code_data_segment` = 0), 1 indicates TSS and 0 indicates LDT
+   g->read_write = 0;             // For a TSS, indicates busy (1) or not busy (0).
+   g->conforming_expand_down = 0; // always 0 for TSS
+   g->code = 1;                   // For a TSS, 1 indicates 32-bit (1) or 16-bit (0).
+   g->code_data_segment = 0;      // indicates TSS/LDT (see also `accessed`)
+   g->DPL = 0;                    // ring 0, see the comments below
+   g->present = 1;
+   g->limit_high = (limit & (0xf << 16)) >> 16; // isolate top nibble
+   g->available = 0;                            // 0 for a TSS
+   g->long_mode = 0;
+   g->big = 0;                                 // should leave zero according to manuals.
+   g->gran = 0;                                // limit is in bytes, not pages
+   g->base_high = (base & (0xff << 24)) >> 24; // isolate top byte
 
-   gdt_entry->granularity |= gran & 0xF0;
-   gdt_entry->access = access;
+   // Ensure the TSS is initially zero'd.
+   memset((char *)&tss_entry, 0, sizeof(tss_entry));
+
+   tss_entry.ss0 = 0x10; // Set the kernel stack segment.
+   tss_entry.esp0 = 0;   // Set the kernel stack pointer.
+                         // note that CS is loaded from the IDT entry and should be the regular kernel code segment
 }
 
 void init_idt()

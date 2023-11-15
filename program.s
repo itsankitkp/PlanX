@@ -4,5 +4,5 @@ global _start
 
 _start:
        mov eax, 0xDEADBEEF
-       hlt; hlt                      ;halt the CPU
+       jmp $;                     ;halt the CPU
 

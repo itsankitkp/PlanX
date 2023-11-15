@@ -15,4 +15,7 @@ u32int kmalloc_a(u32int sz, int align);
 u32int kmalloc_ap(u32int sz, int align, u32int *phys);
 u32int kmalloc(u32int sz);                  // vanilla (normal).
 
+static inline void invlpg(u32int addr) {
+    asm volatile("invlpg (%0)" ::"r" (addr) : "memory");
+}
 #endif

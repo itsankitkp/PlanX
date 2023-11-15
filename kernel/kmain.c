@@ -4,38 +4,42 @@
 #include "multiboot.h"
 #include "stdio.h"
 #include "paging.h"
-// void run_modules(multiboot_info_t *mb_info)
-// {
+#include "tss.h"
+void run_modules(multiboot_info_t *mb_info)
+{
 
-//     /* Check if modules are available */
-//     multiboot_uint32_t mods_count = mb_info->mods_count; /* Get the amount of modules available */
+    /* Check if modules are available */
+    multiboot_uint32_t mods_count = mb_info->mods_count; /* Get the amount of modules available */
 
-//     multiboot_uint32_t mods_addr = mb_info->mods_addr; /* And the starting address of the modules */
+    multiboot_uint32_t mods_addr = mb_info->mods_addr; /* And the starting address of the modules */
 
-//     for (u32int mod = 0; mod < mods_count; mod++)
-//     {
-//         multiboot_module_t *module = (multiboot_module_t *)(mods_addr + (mod * sizeof(multiboot_module_t))); /* Loop through all modules */
-//         call_module_t start_program = (call_module_t)module->mod_start;
-//         if (start_program)
-//         {
-//         }
-//     }
-// }
+    for (u32int mod = 0; mod < mods_count; mod++)
+    {
+        multiboot_module_t *module = (multiboot_module_t *)(mods_addr + (mod * sizeof(multiboot_module_t))); /* Loop through all modules */
+        call_module_t start_program = (call_module_t)module->mod_start;
+        enable_page((u32int) start_program, 10);
+        if (start_program)
+        {
+            enter_user_mode((u32int)start_program);
+        }
+    }
+}
 
-int main()
+int main(const void *multiboot_struct)
 {
     fb_clear_screen();
-
-    fb_write("System is up\0", WHITE);
-
     init_descriptor_tables();
-    fb_write("\nDone all init\0", WHITE);
+    
+    fb_write("System is up\0", WHITE);
+    tss_init(5, 0x10, 0);
+    if (!multiboot_struct){}
     init_paging();
-    fb_write("Paging init\0", WHITE);
-    //asm volatile ("int $0x8");
-     u32int ptr = *(u32int*)0xA0000000;
-ptr++;
-    return 0;
-
-    // asm volatile ("int $0x8");
+    
+//     enable_page(0x00000000, 10);
+//     enable_page(0x10000000, 10);
+//     enable_page(0xBFFFFFFB, 1);
+//      u32int ptr = *(u32int*)0xA0000000;
+// ptr++;
+//     return 0;
+ run_modules((multiboot_info_t *)multiboot_struct);
 }

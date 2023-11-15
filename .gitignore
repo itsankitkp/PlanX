@@ -1,3 +1,5 @@
 *.o
 *.elf
+.gdb_history
 iso/*
+os.iso

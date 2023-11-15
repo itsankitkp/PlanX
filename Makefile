@@ -41,6 +41,11 @@ os.iso: kernel.elf
 	mkdir -p iso/boot/modules
 	cp kernel.elf iso/boot/kernel.elf
 	cp grub.cfg iso/boot/grub/grub.cfg
+
+	nasm -f elf32   program.s -o program.o
+	ld -m elf_i386 program.o -o program
+	cp program iso/boot/modules/program
+
 	grub-mkrescue -o os.iso iso/
 
 run: os.iso

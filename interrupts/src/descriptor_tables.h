@@ -45,7 +45,7 @@ struct idt_ptr_struct
 typedef struct idt_ptr_struct idt_ptr_t;
 
 #define GDTBASE 0xC0000800
-#define GDTSIZE 5 // number of gdt entries
+#define GDTSIZE 6 // number of gdt entries
 
 #define IDTBASE 0xC0000A00
 #define IDTSIZE 32
@@ -94,4 +94,36 @@ extern void idt_flush(u32int);
 
 // Internal function prototypes.
 void init_gdt();
-void gdt_set_gate(u32int, u32int, u8int, u8int, gdt_entry_t *);
+void gdt_set_entry(int index, u32int base, u32int limit, u8int access, u8int gran);
+
+typedef struct tss_entry {
+    u32int prevTss;
+    u32int esp0;
+    u32int ss0;
+    u32int esp1;
+    u32int ss1;
+    u32int esp2;
+    u32int ss2;
+    u32int cr3;
+    u32int eip;
+    u32int eflags;
+    u32int eax;
+    u32int ecx;
+    u32int edx;
+    u32int ebx;
+    u32int esp;
+    u32int ebp;
+    u32int esi;
+    u32int edi;
+    u32int es;
+    u32int cs;
+    u32int ss;
+    u32int ds;
+    u32int fs;
+    u32int gs;
+    u32int ldt;
+    u16int trap;
+    u16int iomap;
+}tss_entry_t;
+
+

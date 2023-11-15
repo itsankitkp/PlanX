@@ -4,6 +4,7 @@
 #include "multiboot.h"
 #include "stdio.h"
 #include "paging.h"
+#include "tss.h"
 void run_modules(multiboot_info_t *mb_info)
 {
 
@@ -28,10 +29,12 @@ int main(const void *multiboot_struct)
 {
     fb_clear_screen();
     init_descriptor_tables();
-
+    
     fb_write("System is up\0", WHITE);
+    tss_init(5, 0x10, 0);
     if (!multiboot_struct){}
     init_paging();
+    
 //     enable_page(0x00000000, 10);
 //     enable_page(0x10000000, 10);
 //     enable_page(0xBFFFFFFB, 1);

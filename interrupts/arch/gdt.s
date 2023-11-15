@@ -1,18 +1,22 @@
-[GLOBAL gdt_flush]    ; Allows the C code to call gdt_flush().
+%define KERNEL_DATA_SEGMENT 0x10
+%define CODE_DATA_SEGMENT 0x08
 
+[GLOBAL gdt_flush]
 gdt_flush:
-   mov eax, [esp+4]  ; Get the pointer to the GDT, passed as a parameter.
-   lgdt [eax]        ; Load the new GDT pointer
+    mov eax, [esp + 4]
+    lgdt [eax]
 
-   mov ax, 0x10      ; 0x10 is the offset in the GDT to our data segment
-   mov ds, ax        ; Load all data segment selectors
-   mov es, ax
-   mov fs, ax
-   mov gs, ax
-   mov ss, ax
-   jmp 0x08:.flush   ; 0x08 is the offset to our code segment: Far jump!
-.flush:
-   ret
+    mov ax, KERNEL_DATA_SEGMENT
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+
+    jmp CODE_DATA_SEGMENT:flush 
+flush:
+    ret
+
 
 
  [GLOBAL idt_flush]    ; Allows the C code to call idt_flush().
@@ -102,3 +106,8 @@ ISR_NOERRCODE 29
 ISR_NOERRCODE 30
 ISR_NOERRCODE 31
 
+global tss_flush
+tss_flush:
+    mov ax, 0x28
+    ltr ax
+    ret

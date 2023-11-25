@@ -25,7 +25,7 @@ enablePaging:
 enter_user_mode:
     push ebp
     mov ebp, esp
-    mov ecx, [ebp + 8]
+    ;mov ecx, [ebp + 8]
     
 	mov ax, (4 * 8) | 3 ; ring 3 data with bottom 2 bits set for ring 3
 	mov ds, ax
@@ -39,5 +39,6 @@ enter_user_mode:
 	push eax ; current esp
 	pushf ; eflags
 	push (3 * 8) | 3 ; code selector (ring 3 code with bottom 2 bits set for ring 3)
-	push ecx ; instruction address to return to
+	lea eax, 0x0	
+    push eax ; instruction address to return to
 	iret

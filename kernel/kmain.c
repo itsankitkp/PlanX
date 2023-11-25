@@ -5,6 +5,7 @@
 #include "stdio.h"
 #include "paging.h"
 #include "tss.h"
+#include "kheap.h"
 void run_modules(multiboot_info_t *mb_info)
 {
 
@@ -17,10 +18,16 @@ void run_modules(multiboot_info_t *mb_info)
     {
         multiboot_module_t *module = (multiboot_module_t *)(mods_addr + (mod * sizeof(multiboot_module_t))); /* Loop through all modules */
         call_module_t start_program = (call_module_t)module->mod_start;
-        enable_page((u32int) start_program, 10);
+
         if (start_program)
         {
-            enter_user_mode((u32int)start_program);
+            init_user_space_paging();
+            invlpg(0);
+            memcpy(0, start_program, (call_module_t)module->mod_end-(call_module_t)module->mod_start);
+            call_module_t code = 0x0;
+            enter_user_mode();
+       
+
         }
     }
 }
@@ -37,7 +44,7 @@ int main(const void *multiboot_struct)
     
 //     enable_page(0x00000000, 10);
 //     enable_page(0x10000000, 10);
-//     enable_page(0xBFFFFFFB, 1);
+//     enable_page(0xA0000000, 1);
 //      u32int ptr = *(u32int*)0xA0000000;
 // ptr++;
 //     return 0;

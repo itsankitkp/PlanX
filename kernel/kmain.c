@@ -22,9 +22,10 @@ void run_modules(multiboot_info_t *mb_info)
         if (start_program)
         {
             init_user_space_paging();
+            // __asm__ ("int $0x80");
+            
             invlpg(0);
-            memcpy(0, start_program, (call_module_t)module->mod_end-(call_module_t)module->mod_start);
-            call_module_t code = 0x0;
+            memcpy(0, (char*) start_program, (call_module_t)module->mod_end-(call_module_t)module->mod_start);
             enter_user_mode();
        
 

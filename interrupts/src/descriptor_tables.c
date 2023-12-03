@@ -39,6 +39,7 @@ void init_gdt()
     // User code and data segments, only differ in ring number(ring 3)
     gdt_set_entry(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);
     gdt_set_entry(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);
+    gdt_set_entry(6, 0, 0xFFFFFFFF, 0xF2, 0xCF); 
 
    memcpy((char *)gdt_ptr.base, (char *)gdt_entries, gdt_ptr.limit);
 
@@ -85,6 +86,8 @@ void init_idt()
    idt_set_gate((u32int)isr29, 0x08, 0x8E, &idt_entries[29]);
    idt_set_gate((u32int)isr30, 0x08, 0x8E, &idt_entries[30]);
    idt_set_gate((u32int)isr31, 0x08, 0x8E, &idt_entries[31]);
+   idt_set_gate((u32int)isr128, 0x08, 0xEE, &idt_entries[128]);
+
 
    memcpy((char *)idt_ptr.base, (char *)idt_entries, idt_ptr.limit);
 
@@ -100,7 +103,7 @@ void idt_set_gate(u32int base, u16int sel, u8int flags, idt_entry_t *idt_entry)
    idt_entry->always0 = 0;
    // We must uncomment the OR below when we get to using user-mode.
    // It sets the interrupt gate's privilege level to 3.
-   idt_entry->flags = flags /* | 0x60 */;
+   idt_entry->flags = flags;  //| 0x60 ;
 }
 
 void gdt_set_entry(int index, u32int base, u32int limit, u8int access, u8int gran) {

@@ -47,8 +47,8 @@ typedef struct idt_ptr_struct idt_ptr_t;
 #define GDTBASE 0xC0000800
 #define GDTSIZE 6 // number of gdt entries
 
-#define IDTBASE 0xC0000A00
-#define IDTSIZE 32
+#define IDTBASE 0xC0000000
+#define IDTSIZE 256
 // These extern directives let us access the addresses of our ASM ISR handlers.
 
 extern void isr0();
@@ -83,7 +83,7 @@ extern void isr28();
 extern void isr29();
 extern void isr30();
 extern void isr31();
-
+extern void isr128();
 void init_idt();
 void idt_set_gate(u32int base, u16int sel, u8int flags, idt_entry_t* idt_entry);
 

@@ -23,6 +23,7 @@ enablePaging:
 
 [GLOBAL enter_user_mode]
 enter_user_mode:
+    sti
     push ebp
     mov ebp, esp
     ;mov ecx, [ebp + 8]

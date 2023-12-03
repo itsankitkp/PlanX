@@ -35,7 +35,7 @@ enter_user_mode:
 	mov gs, ax ; SS is handled by iret
  
 	; set up the stack frame iret expects
-	mov eax, esp
+	mov eax, 0x1000
 	push (4 * 8) | 3 ; data selector
 	push eax ; current esp
 	pushf ; eflags

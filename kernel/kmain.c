@@ -25,6 +25,7 @@ void run_modules(multiboot_info_t *mb_info)
             // __asm__ ("int $0x80");
             
             invlpg(0);
+            invlpg(0xC0000000);
             memcpy(0, (char*) start_program, (call_module_t)module->mod_end-(call_module_t)module->mod_start);
             enter_user_mode();
        
@@ -39,7 +40,7 @@ int main(const void *multiboot_struct)
     init_descriptor_tables();
     
     fb_write("System is up\0", WHITE);
-    tss_init(5, 0x10, 0);
+    tss_init(5, 0x10, 0x10);
     if (!multiboot_struct){}
     init_paging();
     

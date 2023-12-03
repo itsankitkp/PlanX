@@ -53,6 +53,9 @@ run: os.iso
 debug: os.iso
 	$(QEMU) -boot d -cdrom os.iso -m 512 -s -S
 
+reset: os.iso
+	$(QEMU) -boot d -cdrom os.iso -m 512 -d int,cpu_reset --no-reboot
+
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDE_FLAGS)  $< -o $@
 

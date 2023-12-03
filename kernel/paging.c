@@ -61,6 +61,7 @@ void enable_page(u32int addr, u32int count)
 u32int user_page_directory[1024] __attribute__((aligned(4096)));
 u32int user_page_table1[1024] __attribute__((aligned(4096)));
 u32int user_page_table2[1024] __attribute__((aligned(4096)));
+u32int user_page_table1023[1024] __attribute__((aligned(4096)));
 void init_user_space_paging()
 {
      //set each entry to not present
@@ -83,11 +84,13 @@ for(i = 0; i < 1024; i++)
     // Those bits are used by the attributes ;)
    user_page_table1[i] = (i * 0x1000) | 7; // attributes: supervisor level, read/write, present.
     user_page_table2[i] = (i * 0x1000) | 7;
+    user_page_table1023[i] = (i * 0x1000) | 7;
     allocated_phy_addr += (i * 0x1000);
 }
 user_page_directory[0] = (((unsigned int)user_page_table1)-KERNEL_HIGH_MEM) | 7;
 user_page_directory[1] = (((unsigned int)user_page_table2)-KERNEL_HIGH_MEM) | 7;
-user_page_directory[768] = (((unsigned int)high_page_table)-KERNEL_HIGH_MEM) | 3;
+user_page_directory[768] = (((unsigned int)high_page_table)-KERNEL_HIGH_MEM) | 7;
+user_page_directory[1023] = (((unsigned int)user_page_table1023)-KERNEL_HIGH_MEM) | 7;
 
 u32int page_directory_phy_addr = (unsigned int)user_page_directory-KERNEL_HIGH_MEM;
 loadPageDirectory(page_directory_phy_addr);

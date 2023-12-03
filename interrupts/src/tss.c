@@ -8,8 +8,7 @@ tss_entry_t kernel_tss;
  *
  * */
 void tss_init(u32int idx, u32int kss, u32int kesp) {
-    //u32int base = (u32int)&kernel_tss;
-    u32int base = 0;
+    u32int base = (u32int)&kernel_tss;
     gdt_set_entry(idx, base, base + sizeof(tss_entry_t), 0xE9, 0);
     /* Kernel tss, access(E9 = 1 11 0 1 0 0 1)
         1   present

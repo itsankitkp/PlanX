@@ -6,6 +6,7 @@
 #include "paging.h"
 #include "tss.h"
 #include "kheap.h"
+#include "process.h"
 void run_modules(multiboot_info_t *mb_info)
 {
 
@@ -18,10 +19,14 @@ void run_modules(multiboot_info_t *mb_info)
     {
         multiboot_module_t *module = (multiboot_module_t *)(mods_addr + (mod * sizeof(multiboot_module_t))); /* Loop through all modules */
         call_module_t start_program = (call_module_t)module->mod_start;
+        process_t *p = (process_t*) kmalloc_a(sizeof(process_t), TRUE);
+        
+        p->code = start_program;
+        
 
         if (start_program)
         {
-            init_user_space_paging();
+            init_user_space_paging(&p);
             // __asm__ ("int $0x80");
             
             invlpg(0);

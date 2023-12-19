@@ -1,6 +1,7 @@
 #include "common.h"
 #include "kheap.h"
 #include "io.h"
+#include "process.h"
 extern u32int endkernel;
 u32int page_directory[1024] __attribute__((aligned(4096)));
 u32int first_page_table[1024] __attribute__((aligned(4096)));
@@ -62,7 +63,7 @@ u32int user_page_directory[1024] __attribute__((aligned(4096)));
 u32int user_page_table1[1024] __attribute__((aligned(4096)));
 u32int user_page_table2[1024] __attribute__((aligned(4096)));
 u32int user_page_table1023[1024] __attribute__((aligned(4096)));
-void init_user_space_paging()
+void init_user_space_paging(process_t* p)
 {
      //set each entry to not present
 int i;
@@ -92,7 +93,9 @@ user_page_directory[1] = (((unsigned int)user_page_table2)-KERNEL_HIGH_MEM) | 7;
 user_page_directory[768] = (((unsigned int)high_page_table)-KERNEL_HIGH_MEM) | 7;
 user_page_directory[1023] = (((unsigned int)user_page_table1023)-KERNEL_HIGH_MEM) | 7;
 
-u32int page_directory_phy_addr = (unsigned int)user_page_directory-KERNEL_HIGH_MEM;
+memcpy(*p->pd, user_page_directory, sizeof(user_page_directory));
+
+u32int page_directory_phy_addr = (unsigned int)*p->pd-KERNEL_HIGH_MEM;
 loadPageDirectory(page_directory_phy_addr);
 
 

@@ -23,13 +23,15 @@ void run_modules(multiboot_info_t *mb_info)
 
         if (start_program)
         {
+            u32int size = (call_module_t)module->mod_end-(call_module_t)module->mod_start;
             process_t* p = kmalloc_a(sizeof(process_t), TRUE);
             init_user_space_paging(p);
             // __asm__ ("int $0x80");
             
             invlpg(0);
+            invlpg(0x1000000);
             invlpg(0xC0000000);
-            memcpy(0, (char*) start_program, (call_module_t)module->mod_end-(call_module_t)module->mod_start);
+            memcpy(0, (char*) start_program, size);
             enter_user_mode();
        
 

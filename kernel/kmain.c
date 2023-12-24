@@ -15,43 +15,27 @@ void run_modules(multiboot_info_t *mb_info)
     multiboot_uint32_t mods_count = mb_info->mods_count; /* Get the amount of modules available */
 
     multiboot_uint32_t mods_addr = mb_info->mods_addr; /* And the starting address of the modules */
-    process_t *p1, *p2;
+    process_t *p[2];
     for (u32int mod = 0; mod < mods_count; mod++)
     {
         multiboot_module_t *module = (multiboot_module_t *)(mods_addr + (mod * sizeof(multiboot_module_t))); /* Loop through all modules */
         call_module_t start_program = (call_module_t)module->mod_start;
-        if (mod == 0)
-        {
-            if (start_program)
-            {
-                u32int size = (call_module_t)module->mod_end - (call_module_t)module->mod_start;
-                p1 = (process_t *)kmalloc_a(sizeof(process_t), TRUE);
-                init_user_space_paging(p1);
-                // __asm__ ("int $0x80");
 
-                invlpg(0);
-                invlpg(0xC0000000);
-                memcpy(0, (char *)start_program, size);
-                // enter_user_mode();
-            }
-        }
-        else
+        if (start_program)
         {
-            if (start_program)
-            {
-                u32int size = (call_module_t)module->mod_end - (call_module_t)module->mod_start;
-                p2 = (process_t *)kmalloc_a(sizeof(process_t), TRUE);
-                init_user_space_paging(p2);
-                // __asm__ ("int $0x80");
+            u32int size = (call_module_t)module->mod_end - (call_module_t)module->mod_start;
+            p[mod] = (process_t *)kmalloc_a(sizeof(process_t), TRUE);
+            init_user_space_paging(p[mod]);
+            // __asm__ ("int $0x80");
 
-                invlpg(0);
-                invlpg(0xC0000000);
-                memcpy(0, (char *)start_program, size);
-                // enter_user_mode();
-            }
+            invlpg(0);
+            invlpg(0xC0000000);
+            memcpy(0, (char *)start_program, size);
+            // enter_user_mode();
         }
     }
-    u32int page_directory_phy_addr = (u32int)&p2->pd - 0xC0000000;
+
+    u32int page_directory_phy_addr = (u32int)&p[1]->pd - 0xC0000000;
     loadPageDirectory(page_directory_phy_addr);
     enter_user_mode();
 }

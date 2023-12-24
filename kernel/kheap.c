@@ -1,6 +1,6 @@
 #include "common.h"
 #include "kheap.h"
-u32int placement_address;
+u32int placement_address=0xc0200000;
 u32int kmalloc(u32int sz)
 {
     u32int tmp = placement_address;

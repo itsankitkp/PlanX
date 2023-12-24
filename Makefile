@@ -42,8 +42,7 @@ os.iso: kernel.elf
 	cp kernel.elf iso/boot/kernel.elf
 	cp grub.cfg iso/boot/grub/grub.cfg
 
-	nasm -f elf32   program.s -o program.o
-	ld -m elf_i386 program.o -o program
+	nasm -f bin program.s -o program
 	cp program iso/boot/modules/program
 
 	grub-mkrescue -o os.iso iso/
@@ -53,6 +52,9 @@ run: os.iso
 
 debug: os.iso
 	$(QEMU) -boot d -cdrom os.iso -m 512 -s -S
+
+reset: os.iso
+	$(QEMU) -boot d -cdrom os.iso -m 512 -d int,cpu_reset --no-reboot
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDE_FLAGS)  $< -o $@

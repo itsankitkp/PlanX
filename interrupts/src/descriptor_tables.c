@@ -67,7 +67,7 @@ void init_idt()
    idt_set_gate((u32int)isr11, 0x08, 0x8E, &idt_entries[11]);
    idt_set_gate((u32int)isr12, 0x08, 0x8E, &idt_entries[12]);
    idt_set_gate((u32int)isr13, 0x08, 0x8E, &idt_entries[13]);
-   idt_set_gate((u32int)isr14, 0x08, 0x8E, &idt_entries[14]);
+   idt_set_gate((u32int)isr14, 0x08, 0xEE, &idt_entries[14]);
    idt_set_gate((u32int)isr15, 0x08, 0x8E, &idt_entries[15]);
    idt_set_gate((u32int)isr16, 0x08, 0x8E, &idt_entries[16]);
    idt_set_gate((u32int)isr17, 0x08, 0x8E, &idt_entries[17]);
@@ -85,6 +85,8 @@ void init_idt()
    idt_set_gate((u32int)isr29, 0x08, 0x8E, &idt_entries[29]);
    idt_set_gate((u32int)isr30, 0x08, 0x8E, &idt_entries[30]);
    idt_set_gate((u32int)isr31, 0x08, 0x8E, &idt_entries[31]);
+   idt_set_gate((u32int)isr128, 0x08, 0xEE, &idt_entries[128]);
+
 
    memcpy((char *)idt_ptr.base, (char *)idt_entries, idt_ptr.limit);
 
@@ -100,7 +102,7 @@ void idt_set_gate(u32int base, u16int sel, u8int flags, idt_entry_t *idt_entry)
    idt_entry->always0 = 0;
    // We must uncomment the OR below when we get to using user-mode.
    // It sets the interrupt gate's privilege level to 3.
-   idt_entry->flags = flags /* | 0x60 */;
+   idt_entry->flags = flags | 0x60 ;
 }
 
 void gdt_set_entry(int index, u32int base, u32int limit, u8int access, u8int gran) {

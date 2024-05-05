@@ -16,7 +16,7 @@ sudo apt install qemu-system
 ## Usage
 
 
-| :exclamation:  There is not init process to drop in, hence in order to get any meaningful results, use gdb only   |
+| :exclamation:  Since there is no init process to engage with, it’s recommended to use gdb for running kernel.   |
 |----------------------------------------------|
 1. Run kernel in QEMU
 ```

@@ -29,3 +29,7 @@ make debug
 make clean
 ```
 
+## Architecture
+![kernel](https://github.com/itsankitkp/PlanX/assets/93041495/fa7936b0-3807-4470-9616-84f08218742e)
+
+

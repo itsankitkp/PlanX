@@ -23,6 +23,10 @@ make run
 ```
 make debug
 ```
+drop into gdb by
+```
+sudo gdb kernel.elf
+```
 
 3. Clean up
 ```
